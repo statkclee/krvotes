@@ -28,6 +28,7 @@ president <- presid_2018_dat %>%
 
 # unit test -------------
 
+
 test_that("대선 2018 후보득표검증", {
 
     presid_2018_check_df <- president %>%
@@ -41,7 +42,7 @@ test_that("대선 2018 후보득표검증", {
     expect_that( presid_2018_check_df$홍준표, equals(7852849))
     expect_that( presid_2018_check_df$안철수, equals(6998342))
     expect_that( presid_2018_check_df$유승민, equals(2208771))
-    expect_that( presid_2018_check_df$유승민, equals(2017458))
+    expect_that( presid_2018_check_df$심상정, equals(2017458))
 })
 
 
