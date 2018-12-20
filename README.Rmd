@@ -1,0 +1,37 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
+# Korean Votes
+
+The goal of `krvotes` is to provide the Korean votes information. 
+
+## Installation
+
+You can install the devloping version of `krvotes` from [github](https://github.com/statkclee/krvotes) with:
+
+``` r
+# install.packages('remotes')
+remotes::install_github("statkclee/krvotes")
+```
+
+## Example 
+
+```{r krvotes-president}
+# load package
+library(krvotes)
+# read presidential votes 2018 and assign it to president_df
+president_df <- president
+# check the structure of the object
+str(object = president_df)
+```
