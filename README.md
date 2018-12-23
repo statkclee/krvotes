@@ -15,12 +15,13 @@ You can install the devloping version of `krvotes` from
 remotes::install_github("statkclee/krvotes")
 ```
 
-Example
--------
+Example - Presidential Election in 2017
+---------------------------------------
 
 ``` r
 # load package
 library(krvotes)
+suppressMessages(library(tidyverse))
 # read presidential votes 2018 and assign it to president_df
 president_df <- president
 # check the structure of the object
@@ -37,4 +38,23 @@ str(object = president_df)
 #>  $ 안철수  : num  65 2509 304 352 342 ...
 #>  $ 유승민  : num  8 1156 75 120 107 ...
 #>  $ 심상정  : num  15 1145 214 149 96 ...
+```
+
+Example - local Election in 2018
+--------------------------------
+
+``` r
+local_2018_df <- local_2018
+
+jeju_df <- local_2018_df %>%
+  filter(str_detect(precinct, "제주")) %>%
+  pull(data_clean) %>%
+  .[[1]]
+
+jeju_df %>%
+  summarize(`문대림` = sum(democracy))
+#> # A tibble: 1 x 1
+#>   문대림
+#>    <dbl>
+#> 1 137901
 ```

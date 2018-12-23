@@ -27,13 +27,28 @@ You can install the devloping version of `krvotes` from [github](https://github.
 remotes::install_github("statkclee/krvotes")
 ```
 
-## Example 
+## Example - Presidential Election in 2017
 
 ```{r krvotes-president}
 # load package
 library(krvotes)
+suppressMessages(library(tidyverse))
 # read presidential votes 2018 and assign it to president_df
 president_df <- president
 # check the structure of the object
 str(object = president_df)
+```
+
+## Example - local Election in 2018
+
+```{r krvotes-local}
+local_2018_df <- local_2018
+
+jeju_df <- local_2018_df %>%
+  filter(str_detect(precinct, "제주")) %>%
+  pull(data_clean) %>%
+  .[[1]]
+
+jeju_df %>%
+  summarize(`문대림` = sum(democracy))
 ```
