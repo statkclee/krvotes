@@ -15,14 +15,35 @@ You can install the devloping version of `krvotes` from
 remotes::install_github("statkclee/krvotes")
 ```
 
-Example - Presidential Election in 2017
----------------------------------------
+### 국회의원 선거 - 2016
 
 ``` r
 # load package
 library(krvotes)
 suppressMessages(library(tidyverse))
 
+# 국회의원 선거 (2016)
+congress_df <- congress_2018
+
+# 지역구: 경기도 성남시 분당구 을
+
+congress_df %>%
+    filter(sido == "경기" & precinct == "성남시분당구을") %>%
+    pull(data_clean) %>% .[[1]] %>%
+    summarise(`더불어민주당 김병욱` = sum(`더불어민주당 김병욱`),
+              `새누리당 전하진`     = sum(`새누리당 전하진`),
+              `국민의당 윤은숙`     = sum(`국민의당 윤은숙`),
+              `무소속 임태희`       = sum(`무소속 임태희`))
+#> # A tibble: 1 x 4
+#>   `더불어민주당 김병욱` `새누리당 전하진` `국민의당 윤은숙` `무소속 임태희`
+#>                   <dbl>             <dbl>             <dbl>           <dbl>
+#> 1                 50661             39367             11936           23921
+```
+
+대통령 선거 - 2017
+------------------
+
+``` r
 # read presidential votes 2018 and assign it to president_df
 president_df <- president
 # check the structure of the object
@@ -41,10 +62,10 @@ str(object = president_df)
 #>  $ 심상정  : num  15 1145 214 149 96 ...
 ```
 
-Example - local Election in 2018
---------------------------------
+지방선거 선거 - 2018
+--------------------
 
-### Provicial Governor
+### 시도지사 득표
 
 ``` r
 local_2018_df <- local_2018
@@ -62,7 +83,7 @@ jeju_df %>%
 #> 1 137901
 ```
 
-### Mayor and County Governor
+### 시군구장 득표
 
 ``` r
 local_sigungu_df <- local_sigungu_2018
@@ -74,12 +95,12 @@ changwon_df <- local_sigungu_df %>%
 
 changwon_df %>% 
   filter(str_detect(sigungu, "성산")) %>% 
-  summarise(허성무 = sum(`더불어민주당 허성무`),
-            조진래 = sum(`자유한국당 조진래`),
-            정규헌  = sum(`바른미래당 정규헌`),
-            석영철  = sum(`민중당 석영철`),
-            안상수  = sum(`무소속 안상수`),
-            이기우  = sum(`무소속 이기우`))
+  summarise(`허성무` = sum(`더불어민주당 허성무`),
+            `조진래` = sum(`자유한국당 조진래`),
+            `정규헌` = sum(`바른미래당 정규헌`),
+            `석영철` = sum(`민중당 석영철`),
+            `안상수` = sum(`무소속 안상수`),
+            `이기우` = sum(`무소속 이기우`))
 #> # A tibble: 1 x 6
 #>   허성무 조진래 정규헌 석영철 안상수 이기우
 #>    <dbl>  <dbl>  <dbl>  <dbl>  <dbl>  <dbl>
