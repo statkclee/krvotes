@@ -22,6 +22,7 @@ Example - Presidential Election in 2017
 # load package
 library(krvotes)
 suppressMessages(library(tidyverse))
+
 # read presidential votes 2018 and assign it to president_df
 president_df <- president
 # check the structure of the object
@@ -43,6 +44,8 @@ str(object = president_df)
 Example - local Election in 2018
 --------------------------------
 
+### Provicial Governor
+
 ``` r
 local_2018_df <- local_2018
 
@@ -58,3 +61,41 @@ jeju_df %>%
 #>    <dbl>
 #> 1 137901
 ```
+
+### Mayor and County Governor
+
+``` r
+local_sigungu_df <- local_sigungu_2018
+
+changwon_df <- local_sigungu_df %>% 
+  filter(str_detect(precinct, "창원")) %>% 
+  select(data_clean) %>% 
+  unnest()
+
+changwon_df %>% 
+  filter(str_detect(sigungu, "성산")) %>% 
+  summarise(허성무 = sum(`더불어민주당 허성무`),
+            조진래 = sum(`자유한국당 조진래`),
+            정규헌  = sum(`바른미래당 정규헌`),
+            석영철  = sum(`민중당 석영철`),
+            안상수  = sum(`무소속 안상수`),
+            이기우  = sum(`무소속 이기우`))
+#> # A tibble: 1 x 6
+#>   허성무 조진래 정규헌 석영철 안상수 이기우
+#>    <dbl>  <dbl>  <dbl>  <dbl>  <dbl>  <dbl>
+#> 1  68023  29669   3202   4139  16282   2782
+```
+
+-   [중앙선거관리위원회 - 선거통계시스템](http://info.nec.go.kr/)
+
+역대선거 → 지방선거 → 제7회 → 구시군의 장선거 → 경상남도 → 창원시 →
+창원시성산구
+
+| 후보                | 득표수 |
+|---------------------|--------|
+| 더불어민주당 허성무 | 68,023 |
+| 자유한국당 조진래   | 29,669 |
+| 바른미래당 정규헌   | 3,202  |
+| 민중당 석영철       | 4,139  |
+| 무소속 안상수       | 16,282 |
+| 무소속 이기우       | 2,782  |

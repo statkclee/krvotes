@@ -13,6 +13,7 @@ RoxygenNote: 6.1.1
 Depends:
     R (>= 2.10)
 Imports: 
-    tibble
+    tibble,
+    crayon
 URL: https://github.com/statkclee/krvotes
 BugReports: https://github.com/statkclee/krvotes/issues

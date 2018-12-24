@@ -98,6 +98,7 @@ test_that("지방선거 구시군의 장선거 2018 후보득표검증", {
 
     expect_that( local_sigungu_2018_check$`더불어민주당 김영종`, equals(51305))
     expect_that( local_sigungu_2018_check$`자유한국당 이숙연`,   equals(19628))
+    expect_that( local_sigungu_2018_check$`자유한국당 이숙연`,   equals(19628))
     expect_that( local_sigungu_2018_check$`바른미래당 김복동`,   equals(8765))
 })
 
