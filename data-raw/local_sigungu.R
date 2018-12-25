@@ -1,20 +1,31 @@
-# packages -------------
+# 2018년 지방선거 개표결과 - 시도지사
+#
+# 지방선거 구시군의장 엑셀 데이터에서 먼저 선거구별 정당과 후보를 추출해낸다.
+# 추출된 "선거구별 정당과 후보" 즉, `local_sigungu_party`를
+# 구시군의장 시도, 선거구명에 쭉 뿌린다.
+#
+# 이를 바탕으로 각 시도 선거구별로 개표데이터를 후처리한다.
+#
+# 0. 팩키지 불러오기 -------------
 library(tidyverse)
 library(readxl)
 library(testthat)
 
-# read raw data -------------
-## 후보정당과 후보 추출
-var_names <- c("election_type","sido","precinct","sido_name", "sigungu","emd","type","electorate","vote",
-               paste0("party_", seq(1:7)), "total", "invalid", "abstention")
+# 1. 시도 선거구별 정당 후보자 추출  -----
+## 1.1. 데이터 불러오기 -----
+# 출처: https://bit.ly/2Q1fEcq
 
 local_sigungu_2018_dat <- read_excel("data-raw/20180619-7지선-02-(구시군의장)_읍면동별개표자료.xlsx", sheet="7회지선-구시군의장", skip=0,
                                      col_types = c(rep("text",19)))
 
+names(local_sigungu_2018_dat) <- enc2native(names(local_sigungu_2018_dat))
+
+## 1.2.후보정당과 후보 추출 -----
+var_names <- c("선거종류", "시도", "선거구명", "시도명", "구시군명", "읍면동명", "구분",
+               "선거인수", "투표수", paste0("party_", seq(1:7)), "계", "무효투표수", "기권수")
 
 local_sigungu_party <- local_sigungu_2018_dat %>%
-  filter(is.na(`선거인수`)) %>%
-  # select(`시도`, `선거구명`, `후보자별 득표수`, contains("X")) %>%
+  filter(is.na(`시도명`)) %>%
   set_names(var_names) %>%
   mutate(party_1 = ifelse(party_1 == "\r\r\n", "party_1", party_1),
          party_2 = ifelse(party_2 == "\r\r\n", "party_2", party_2),
@@ -23,37 +34,41 @@ local_sigungu_party <- local_sigungu_2018_dat %>%
          party_5 = ifelse(party_5 == "\r\r\n", "party_5", party_5),
          party_6 = ifelse(party_6 == "\r\r\n", "party_6", party_6),
          party_7 = ifelse(party_7 == "\r\r\n", "party_7", party_7))  %>%
-  mutate(sido_name = "sido_name",
-         sigungu   = "sigungu",
-         emd       = "emd",
-         type      = "type",
-         electorate = "electorate",
-         vote       = "vote",
-         invalid    = "invalid",
-         abstention = "abstention") %>%
-  select(-election_type, -sido, -precinct, -total)
+  mutate(`시도명`    = "시도명",
+         `구시군명`  = "구시군명",
+         `읍면동명`  = "읍면동명",
+         `구분`      = "구분",
+         `선거인수`  = "선거인수",
+         `투표수`    = "투표수",
+         `무효투표수`= "무효투표수",
+         `기권수`    = "기권수") %>%
+  select(-`선거종류`, -`계`)
+  # select(-`선거종류`, -`시도명`, -`구시군명`, -`읍면동명`, -`구분`, -`선거인수`, -`투표수`, -`계`, -`무효투표수`, -`기권수`)
 
-## 득표수 데이터
+# 2. 시도 선거구별 득표데이터  -----
+## 2.1. 데이터 불러오기 -----
 local_sigungu_2018_dat <- read_excel("data-raw/20180619-7지선-02-(구시군의장)_읍면동별개표자료.xlsx", sheet="7회지선-구시군의장", skip=1,
                              col_types = c(rep("text",7), rep("numeric", 12)))
 
+names(local_sigungu_2018_dat) <- enc2native(names(local_sigungu_2018_dat))
+
+## 2.2. 데이터 정제 -----
+### 시도 선거구별 리스트칼럼 생성
 local_sigungu_2018_df <- local_sigungu_2018_dat %>%
     set_names(var_names) %>%
-    select(-election_type, -total) %>%
-    group_by(sido, precinct) %>%
+    select(-`선거종류`, -`계`) %>%
+    group_by(`시도`, `선거구명`) %>%
     nest()
 
-
-## 데이터 정리 ------
+## 2.3. 시도 선거구별 득표데이터 칼럼명 설정 -----
 ### 하나인 경우
 local_sigungu_2018_df %>%
-  filter(sido == "서울특별시" & precinct == "종로구") %>%
+  filter(시도 == "서울특별시" & 선거구명 == "종로구") %>%
   pull(data) %>%
   .[[1]] %>%
-  set_names(local_sigungu_party[1,] %>% unlist %>% as.vector)
+  set_names(local_sigungu_party[1,-c(1,2)] %>% unlist %>% as.vector)
 
 ### 전체로 확장
-
 sigungu_list <- list()
 
 for(i in 1:nrow(local_sigungu_2018_df)) {
@@ -61,7 +76,7 @@ for(i in 1:nrow(local_sigungu_2018_df)) {
     filter(row_number() == i) %>%
     pull(data) %>%
     .[[1]] %>%
-    set_names(local_sigungu_party[i,] %>% unlist %>% as.vector %>% str_replace_all(., "\r\r\n", " "))
+    set_names(local_sigungu_party[i, -c(1,2)] %>% unlist %>% as.vector %>% str_replace_all(., "\r\r\n", " "))
 }
 
 sigungu_df <- sigungu_list %>% enframe %>%
@@ -70,26 +85,23 @@ sigungu_df <- sigungu_list %>% enframe %>%
 local_sigungu_2018 <- bind_cols(local_sigungu_2018_df, sigungu_df) %>%
   select(-index)
 
+## 2.4. 시도 선거구별 득표데이터 정제 -----
 ### 데이터 후처리 -----
 
-local_sigungu_2018 %>%
-  mutate(vote_data = map(data_clean, ~select(., contains("당"))))
-
 local_sigungu_2018 <- local_sigungu_2018 %>%
-    mutate(data_clean = map(data_clean, ~ filter(., !is.na(sido_name)))) %>%
-    mutate(data_clean = map(data_clean, ~ filter(., !is.na(sigungu)))) %>%
-    mutate(data_clean = map(data_clean, ~ filter(., emd !="계"))) %>%
-    mutate(data_clean = map(data_clean, ~ mutate(., type = ifelse(is.na(`type`), emd, type)))) %>% # because of NA
-    mutate(data_clean = map(data_clean, ~ filter(.,  type !="소계" )))
+    mutate(data_clean = map(data_clean, ~ filter(., !is.na(`시도명`)))) %>%
+    mutate(data_clean = map(data_clean, ~ filter(., !is.na(`구시군명`)))) %>%
+    mutate(data_clean = map(data_clean, ~ filter(., `읍면동명` !="계"))) %>%
+    mutate(data_clean = map(data_clean, ~ mutate(., `구분` = ifelse(is.na(`구분`), `읍면동명`, `구분`)))) %>% # because of NA
+    mutate(data_clean = map(data_clean, ~ filter(., `구분` !="소계" ))) %>%
+    mutate(data_clean = map(data_clean, ~ select(., -contains("party"))))
 
-# data wrangling -------------
-
-# unit test -------------
+# 3. 단위테스트 검증 -------------
 
 test_that("지방선거 구시군의 장선거 2018 후보득표검증", {
 
   local_sigungu_2018_check <- local_sigungu_2018 %>%
-        filter(sido == "서울특별시" & precinct == "종로구") %>%
+        filter(시도 == "서울특별시" & 선거구명 == "종로구") %>%
         pull(data_clean) %>% .[[1]] %>%
         mutate_at(vars(contains("당")), funs(as.numeric) ) %>%
         summarise(`더불어민주당 김영종` = sum(`더불어민주당 김영종`),

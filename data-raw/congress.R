@@ -1,13 +1,16 @@
+# 2016년 국회의원 개표결과
+
 # 0. 팩키지 -------------
 library(tidyverse)
 library(readxl)
 library(testthat)
 
 # 1. 데이터 -------------
+# 출처: https://bit.ly/2Ad3Ezy
 ## 1.1. 지역구 한곳 -----
 ### 후보정당과 후보 변수명 처리 자동화
-var_names <- c("emd","type","electorate","vote",
-               paste0("party_", seq(1:21)), "total", "invalid", "abstention")
+var_names <- c("읍면동명","투표구명","선거인수","투표수",
+               paste0("party_", seq(1:21)), "계", "무표투표수", "기권수")
 
 one_dat <- read_excel("data-raw/국회의원선거 개표결과(제20대)/지역구/9경기/개표상황(투표구별)_성남시분당구을.xlsx", sheet="sheet1", skip=4)
 
@@ -16,40 +19,38 @@ candidate_name <- one_dat %>%
     names %>% setdiff(., "계") %>%
     str_replace_all(., "\r\n", " ")
 
-column_names <- c("emd","type","electorate","vote", candidate_name,
-                  paste0("party_", seq(1:(21-length(candidate_name)))), "total", "invalid", "abstention")
-
-column_names
+column_names <- c("읍면동명","투표구명","선거인수","투표수", candidate_name,
+                  paste0("party_", seq(1:(21-length(candidate_name)))), "계", "무표투표수", "기권수")
 
 ### 데이터 정리
 
 one_dat <- read_excel("data-raw/국회의원선거 개표결과(제20대)/지역구/9경기/개표상황(투표구별)_성남시분당구을.xlsx", sheet="sheet1", skip=4)
 
+names(one_dat) <- enc2native(names(one_dat))
+
 one_df <- one_dat %>%
     set_names(column_names) %>%
     select(-contains("party")) %>%
     filter(row_number() != 1) %>%
-    mutate(emd = zoo::na.locf(emd)) %>% # 동별 NA 값 채워넣기
-    filter(emd !="합계") %>%
-    mutate(type = ifelse(is.na(type), emd, type)) %>%
-    filter(type !="소계")
+    mutate(읍면동명 = zoo::na.locf(읍면동명)) %>% # 동별 NA 값 채워넣기
+    filter(읍면동명 !="합계") %>%
+    mutate(`투표구명` = ifelse(is.na(`투표구명`), `읍면동명`, `투표구명`)) %>%
+    filter(`투표구명` !="소계")
 
 ### 데이터 정합성 확인
 
-test_that("국회선거  2018 후보득표검증", {
+test_that("국회선거 성남시 분당구을  2018 후보득표검증", {
 
-    local_sigungu_2018_check <- local_sigungu_2018 %>%
-        filter(sido == "서울특별시" & precinct == "종로구") %>%
-        pull(data_clean) %>% .[[1]] %>%
-        mutate_at(vars(contains("당")), funs(as.numeric) ) %>%
-        summarise(`더불어민주당 김영종` = sum(`더불어민주당 김영종`),
-                  `자유한국당 이숙연`   = sum(`자유한국당 이숙연`),
-                  `바른미래당 김복동`   = sum(`바른미래당 김복동`))
+    one_df_check <- one_df %>%
+        summarise(`더불어민주당 김병욱` = sum(`더불어민주당 김병욱`),
+                  `새누리당 전하진`     = sum(`새누리당 전하진`),
+                  `국민의당 윤은숙`     = sum(`국민의당 윤은숙`),
+                  `무소속 임태희`       = sum(`무소속 임태희`))
 
-    expect_that( local_sigungu_2018_check$`더불어민주당 김영종`, equals(51305))
-    expect_that( local_sigungu_2018_check$`자유한국당 이숙연`,   equals(19628))
-    expect_that( local_sigungu_2018_check$`자유한국당 이숙연`,   equals(19628))
-    expect_that( local_sigungu_2018_check$`바른미래당 김복동`,   equals(8765))
+    expect_that( one_df_check$`더불어민주당 김병욱`, equals(50661))
+    expect_that( one_df_check$`새누리당 전하진`,     equals(39367))
+    expect_that( one_df_check$`국민의당 윤은숙`,     equals(11936))
+    expect_that( one_df_check$`무소속 임태희`,       equals(23921))
 })
 
 ## 1.2. 지역구: 경기도 -----
@@ -98,13 +99,14 @@ gg_candidate_name <- list()
 
 for(i in 1:nrow(gg_vote_df)) {
     tmp_df <- gg_vote_df$data[i] %>% .[[1]]
+
     candidate_name <- tmp_df %>%
         select(grep("[ㄱ-힗]", names(tmp_df), value = TRUE)) %>%
         names %>% setdiff(., "계") %>%
         str_replace_all(., "\r\n", " ")
 
-    column_names <- c("emd","type","electorate","vote", candidate_name,
-                      paste0("party_", seq(1:(21-length(candidate_name)))), "total", "invalid", "abstention")
+    column_names <- c("읍면동명","투표구명","선거인수","투표수", candidate_name,
+                      paste0("party_", seq(1:(21-length(candidate_name)))), "계", "무표투표수", "기권수")
 
     gg_candidate_name[[i]] <- enc2native(column_names)
 }
@@ -121,10 +123,10 @@ for(i in 1:nrow(gg_vote_df)) {
         set_names(gg_candidate_name[[i]]) %>%
         select(-contains("party")) %>%
         filter(row_number() != 1) %>%
-        mutate(emd = zoo::na.locf(emd)) %>% # 동별 NA 값 채워넣기
-        filter(emd !="합계") %>%
-        mutate(type = ifelse(is.na(type), emd, type)) %>%
-        filter(type !="소계")
+        mutate(읍면동명 = zoo::na.locf(읍면동명)) %>% # 동별 NA 값 채워넣기
+        filter(읍면동명 !="합계") %>%
+        mutate(`투표구명` = ifelse(is.na(`투표구명`), `읍면동명`, `투표구명`)) %>%
+        filter(`투표구명` !="소계")
 }
 
 gg_data_clean_df <- gg_data_clean_list %>% enframe %>%
@@ -170,8 +172,6 @@ for(i in 1:length(congress_dir_names)) {
     cat(i, ":", congress_dir_file_names[[i]], "\n")
 }
 
-# listviewer::jsonedit(congress_dir_file_names)
-
 ### 전국 투표데이터 가져오기
 #### 전국 선거구 데이터 프레임작성
 congress_dat <- tibble(
@@ -210,8 +210,8 @@ for(i in 1:nrow(congress_vote_df)) {
         names %>% setdiff(., "계") %>%
         str_replace_all(., "\r\n", " ")
 
-    column_names <- c("emd","type","electorate","vote", candidate_name,
-                      paste0("party_", seq(1:(21-length(candidate_name)))), "total", "invalid", "abstention")
+    column_names <- c("읍면동명","투표구명","선거인수","투표수", candidate_name,
+                      paste0("party_", seq(1:(21-length(candidate_name)))), "계", "무표투표수", "기권수")
 
     congress_candidate_name[[i]] <- enc2native(column_names)
 }
@@ -229,10 +229,10 @@ for(i in 1:nrow(congress_vote_df)) {
         set_names(congress_candidate_name[[i]]) %>%
         select(-contains("party")) %>%
         filter(row_number() != 1) %>%
-        mutate(emd = zoo::na.locf(emd)) %>% # 동별 NA 값 채워넣기
-        filter(emd !="합계") %>%
-        mutate(type = ifelse(is.na(type), emd, type)) %>%
-        filter(type !="소계")
+        mutate(읍면동명 = zoo::na.locf(읍면동명)) %>% # 동별 NA 값 채워넣기
+        filter(읍면동명 !="합계") %>%
+        mutate(`투표구명` = ifelse(is.na(`투표구명`), `읍면동명`, `투표구명`)) %>%
+        filter(`투표구명` !="소계")
 }
 
 congress_data_clean_df <- congress_data_clean_list %>% enframe %>%
