@@ -1,21 +1,31 @@
 <!-- README.md is generated from README.Rmd. Please edit that file -->
-Korean Votes
-============
+한국 선거 득표 데이터
+=====================
 
-The goal of `krvotes` is to provide the Korean votes information.
+`krvotes` 팩키지 개발 목표는 대한민국 선거 득표 데이터를 명령어 하나로
+바로 분석에 넘어갈 수 있도록 정제하여 깨끗한 형태 데이터로 제공하는
+것입니다.
 
-Installation
-------------
+-   2016년 국회의원 선거
+-   2017년 대통령 선거
+-   2018년 지방선거
+    -   시도지사
+    -   구시군의 장
+-   국회의원 지역구 선거구 구역표
 
-You can install the devloping version of `krvotes` from
-[github](https://github.com/statkclee/krvotes) with:
+설치방법
+--------
+
+[GitHub](https://github.com/statkclee/krvotes) 웹사이트에서 다음
+명령어를 통해 개발버전 `krvotes` 팩키지를 설치할 수 있다.
 
 ``` r
 # install.packages('remotes')
 remotes::install_github("statkclee/krvotes")
 ```
 
-### 국회의원 선거 - 2016
+국회의원 선거 - 2016
+--------------------
 
 ``` r
 # load package
@@ -48,18 +58,29 @@ congress_df %>%
 president_df <- president
 # check the structure of the object
 str(object = president_df)
-#> Classes 'tbl_df', 'tbl' and 'data.frame':    18455 obs. of  11 variables:
-#>  $ 시도명  : chr  "서울특별시" "서울특별시" "서울특별시" "서울특별시" ...
-#>  $ 구시군명: chr  "종로구" "종로구" "종로구" "종로구" ...
-#>  $ 읍면동명: chr  "거소·선상투표" "관외사전투표" "재외투표" "청운효자동" ...
-#>  $ 투표구명: chr  "거소·선상투표" "관외사전투표" "재외투표" "관내사전투표" ...
-#>  $ 선거인수: num  218 12803 2490 1784 2493 ...
-#>  $ 투표수  : num  206 12803 1813 1784 1682 ...
-#>  $ 문재인  : num  64 5842 987 819 664 ...
-#>  $ 홍준표  : num  42 2025 215 331 451 ...
-#>  $ 안철수  : num  65 2509 304 352 342 ...
-#>  $ 유승민  : num  8 1156 75 120 107 ...
-#>  $ 심상정  : num  15 1145 214 149 96 ...
+#> Classes 'tbl_df', 'tbl' and 'data.frame':    18455 obs. of  22 variables:
+#>  $ 시도명    : chr  "서울특별시" "서울특별시" "서울특별시" "서울특별시" ...
+#>  $ 구시군명  : chr  "종로구" "종로구" "종로구" "종로구" ...
+#>  $ 읍면동명  : chr  "거소·선상투표" "관외사전투표" "재외투표" "청운효자동" ...
+#>  $ 투표구명  : chr  "거소·선상투표" "관외사전투표" "재외투표" "관내사전투표" ...
+#>  $ 선거인수  : num  218 12803 2490 1784 2493 ...
+#>  $ 투표수    : num  206 12803 1813 1784 1682 ...
+#>  $ 문재인    : num  64 5842 987 819 664 ...
+#>  $ 홍준표    : num  42 2025 215 331 451 ...
+#>  $ 안철수    : num  65 2509 304 352 342 ...
+#>  $ 유승민    : num  8 1156 75 120 107 ...
+#>  $ 심상정    : num  15 1145 214 149 96 ...
+#>  $ 조원진    : num  0 17 8 1 6 1 5 1 2 5 ...
+#>  $ 오영국    : num  1 0 0 0 0 0 0 0 0 0 ...
+#>  $ 장성민    : num  3 4 1 3 5 0 3 9 1 1 ...
+#>  $ 이재오    : num  1 2 0 0 0 0 1 0 0 0 ...
+#>  $ 김선동    : num  0 15 1 3 0 1 2 0 0 1 ...
+#>  $ 이경희    : num  0 6 0 0 1 0 0 0 0 0 ...
+#>  $ 윤홍식    : num  0 9 0 1 3 1 0 0 0 2 ...
+#>  $ 김민찬    : num  2 6 0 2 2 2 0 1 1 1 ...
+#>  $ 계        : num  201 12736 1805 1781 1677 ...
+#>  $ 무표투표수: num  5 67 8 3 5 10 4 5 5 8 ...
+#>  $ 기권수    : num  12 0 677 0 811 658 614 0 966 859 ...
 ```
 
 지방선거 선거 - 2018
@@ -71,12 +92,12 @@ str(object = president_df)
 local_2018_df <- local_2018
 
 jeju_df <- local_2018_df %>%
-  filter(str_detect(precinct, "제주")) %>%
+  filter(str_detect(`시도명`, "제주")) %>%
   pull(data_clean) %>%
   .[[1]]
 
 jeju_df %>%
-  summarize(`문대림` = sum(democracy))
+  summarize(`문대림` = sum(`더불어민주당 문대림`))
 #> # A tibble: 1 x 1
 #>   문대림
 #>    <dbl>
@@ -89,12 +110,12 @@ jeju_df %>%
 local_sigungu_df <- local_sigungu_2018
 
 changwon_df <- local_sigungu_df %>% 
-  filter(str_detect(precinct, "창원")) %>% 
+  filter(str_detect(`선거구명`, "창원")) %>% 
   select(data_clean) %>% 
   unnest()
 
 changwon_df %>% 
-  filter(str_detect(sigungu, "성산")) %>% 
+  filter(str_detect(`구시군명`, "성산")) %>% 
   summarise(`허성무` = sum(`더불어민주당 허성무`),
             `조진래` = sum(`자유한국당 조진래`),
             `정규헌` = sum(`바른미래당 정규헌`),
@@ -120,3 +141,29 @@ changwon_df %>%
 | 민중당 석영철       | 4,139  |
 | 무소속 안상수       | 16,282 |
 | 무소속 이기우       | 2,782  |
+
+국회의원 선거구 구역표
+======================
+
+[통계청
+통계분류포털](https://kssc.kostat.go.kr:8443/ksscNew_web/index.jsp) →
+`행정구역분류` → `자료실`로 가면 행정구역코드표를 구할 수 있고 이것을
+중앙선거관리위원회 [제20대 국회의원선거
+국회의원지역선거구구역표](http://www.nec.go.kr/portal/bbs/view/B0000338/32767.do?menuNo=200185)와
+대조 작업을 통해 국회의원 선거구 구역표를 분석이 가능한 데이터프레임으로
+만들 수 있다.
+
+``` r
+precinct_df <- precinct
+
+glimpse(precinct_df)
+#> Observations: 3,508
+#> Variables: 7
+#> $ 대분류 <int> 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11...
+#> $ 시도명 <chr> "서울특별시", "서울특별시", "서울특별시", "서울특별시", "서울특별시", "서울특별시", "서울특...
+#> $ 중분류 <int> 11010, 11010, 11010, 11010, 11010, 11010, 11010, 11010, 11...
+#> $ 시군구 <chr> "종로구", "종로구", "종로구", "종로구", "종로구", "종로구", "종로구", "종로구", "종...
+#> $ 소분류 <int> 1101053, 1101054, 1101055, 1101056, 1101057, 1101058, 1101...
+#> $ 읍면동 <chr> "사직동", "삼청동", "부암동", "평창동", "무악동", "교남동", "가회동", "종로1·2·3·...
+#> $ 선거구 <chr> "종로구", "종로구", "종로구", "종로구", "종로구", "종로구", "종로구", "종로구", "종...
+```
