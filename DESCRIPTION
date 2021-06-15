@@ -1,15 +1,15 @@
 Package: krvotes
 Type: Package
-Title: Korean Voting Data
-Version: 0.1.0
+Title: 대한민국 선거 데이터
+Version: 0.2.0
 Author: Kwangchun (Victor) Lee
 Maintainer: The package maintainer <kwangchun.lee.7@gmail.com>
-Description: This dataset contains presidential, local, congressman election votes in Korea. 
+Description: 대한민국 
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 6.1.1
+RoxygenNote: 7.1.1
 Depends:
     R (>= 2.10)
 Imports: 

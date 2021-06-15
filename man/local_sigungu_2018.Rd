@@ -4,9 +4,11 @@
 \name{local_sigungu_2018}
 \alias{local_sigungu_2018}
 \title{Local Election 2018 in Korea - Mayor and County Governor}
-\format{tibble with columns}
+\format{
+tibble with columns
+}
 \source{
-http://www.nec.go.kr/portal/bbs/view/B0000338/38843.do?menuNo=200185&searchYear=&searchMonth=&searchWrd=%EC%A7%80%EB%B0%A9%EC%84%A0%EA%B1%B0&searchCnd=1&viewType=&pageIndex=1&section=&searchOption1=
+http://www.nec.go.kr/portal/bbs/view/B0000338/38843.do?menuNo=200185&searchYear=&searchMonth=&searchWrd=\%EC\%A7\%80\%EB\%B0\%A9\%EC\%84\%A0\%EA\%B1\%B0&searchCnd=1&viewType=&pageIndex=1&section=&searchOption1=
 }
 \usage{
 local_sigungu_2018

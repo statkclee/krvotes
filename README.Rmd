@@ -41,7 +41,7 @@ remotes::install_github("statkclee/krvotes")
 
 ```{r krvotes-congressman}
 # load package
-library(krvotes)
+suppressMessages(library(krvotes))
 suppressMessages(library(tidyverse))
 
 # 국회의원 선거 (2016)
@@ -63,9 +63,9 @@ congress_df %>%
 
 ```{r krvotes-president}
 # read presidential votes 2018 and assign it to president_df
-president_df <- president
+president_tbl <- president_2017
 # check the structure of the object
-str(object = president_df)
+str(object = president_tbl)
 ```
 
 ## 지방선거 선거 - 2018
