@@ -7,10 +7,10 @@
 list-column을 갖는 티블
 }
 \source{
-http://www.nec.go.kr/portal/bbs/view/B0000338/37352.do?menuNo=200185&searchYear=&searchMonth=&searchWrd=\%EA\%B0\%9C\%ED\%91\%9C\%EA\%B2\%B0\%EA\%B3\%BC&searchCnd=1&viewType=&pageIndex=1&section=&searchOption1=
+\url{https://www.nec.go.kr/site/nec/ex/bbs/View.do?cbIdx=1129&bcIdx=14879}
 }
 \description{
-제20대 2016년 국회의원 선거
+2016년 4월 13일 치뤄진 국회의원 선거
 }
 \examples{
   <ec>냽珥덉떆 <- congress_2016 \%>\% filter(precinct == "<ec>냽珥덉떆") \%>\% pull(data_clean) \%>\% .[[1]]

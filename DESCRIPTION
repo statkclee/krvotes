@@ -1,7 +1,7 @@
 Package: krvotes
 Type: Package
 Title: 대한민국 선거 데이터
-Version: 0.2.0
+Version: 0.3.0
 Author: Kwangchun (Victor) Lee
 Maintainer: The package maintainer <kwangchun.lee.7@gmail.com>
 Description: 대한민국 
