@@ -3,7 +3,7 @@
 \docType{data}
 \name{local_sigungu_2018}
 \alias{local_sigungu_2018}
-\title{Local Election 2018 in Korea - Mayor and County Governor}
+\title{지방선거 2018년 - 시군구장}
 \format{
 tibble with columns
 }
@@ -14,7 +14,7 @@ http://www.nec.go.kr/portal/bbs/view/B0000338/38843.do?menuNo=200185&searchYear=
 local_sigungu_2018
 }
 \description{
-Local Election 2018 in Korea - Mayor and County Governor
+지방선거 2018년 - 시군구장
 }
 \examples{
   local_2018
