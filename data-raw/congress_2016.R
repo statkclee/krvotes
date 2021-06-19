@@ -1,4 +1,4 @@
-# 2016년 국회의원 개표결과
+# 2016년 국회의원 개표결과 --------------------------------
 
 # 0. 팩키지 -------------
 library(tidyverse)
@@ -12,7 +12,7 @@ library(testthat)
 var_names <- c("읍면동명","투표구명","선거인수","투표수",
                paste0("party_", seq(1:21)), "계", "무표투표수", "기권수")
 
-one_dat <- read_excel("data-raw/국회의원선거 개표결과(제20대)/지역구/9경기/개표상황(투표구별)_성남시분당구을.xlsx", sheet="sheet1", skip=4)
+one_dat <- read_excel("data-raw/제20대 국회의원선거 투표구별 개표결과/지역구/9경기/개표상황(투표구별)_성남시분당구을.xlsx", sheet="sheet1", skip=4)
 
 candidate_name <- one_dat %>%
     select(grep("[ㄱ-힗]", names(one_dat), value = TRUE)) %>%
@@ -24,7 +24,7 @@ column_names <- c("읍면동명","투표구명","선거인수","투표수", cand
 
 ### 데이터 정리
 
-one_dat <- read_excel("data-raw/국회의원선거 개표결과(제20대)/지역구/9경기/개표상황(투표구별)_성남시분당구을.xlsx", sheet="sheet1", skip=4)
+one_dat <- read_excel("data-raw/제20대 국회의원선거 투표구별 개표결과/지역구/9경기/개표상황(투표구별)_성남시분당구을.xlsx", sheet="sheet1", skip=4)
 
 names(one_dat) <- enc2native(names(one_dat))
 
@@ -55,7 +55,7 @@ test_that("국회선거 성남시 분당구을  2018 후보득표검증", {
 
 ## 1.2. 지역구: 경기도 -----
 ### 디렉토리 파일명 생성
-congress_dir_names <- list.dirs("data-raw/국회의원선거 개표결과(제20대)/지역구/9경기/")
+congress_dir_names <- list.dirs("data-raw/제20대 국회의원선거 투표구별 개표결과/지역구/9경기/")
 
 congress_file_names <- list.files(congress_dir_names) %>%
     str_extract(., "^(?!\\~).*")  # 임시 엑셀파일 제거
@@ -138,7 +138,7 @@ gg_df <- bind_cols(gg_df, gg_data_clean_df)  %>%
 
 ### 데이터 정합성 확인
 
-test_that("국회선거 경기도 2018 후보득표검증", {
+test_that("국회선거 경기도 2016 후보득표검증", {
 
     gg_check_df <- gg_df %>%
         filter(sido == "경기" & precinct == "성남시분당구을") %>%
@@ -158,7 +158,7 @@ test_that("국회선거 경기도 2018 후보득표검증", {
 ### 디렉토리 파일명 생성
 congress_dir_file_names <- list()
 
-congress_dir_names <- list.dirs("data-raw/국회의원선거 개표결과(제20대)/지역구/")
+congress_dir_names <- list.dirs("data-raw/제20대 국회의원선거 투표구별 개표결과/지역구/")
 
 congress_dir_names <- congress_dir_names[-1] # 자기자신 디렉토리 제거
 
@@ -238,13 +238,13 @@ for(i in 1:nrow(congress_vote_df)) {
 congress_data_clean_df <- congress_data_clean_list %>% enframe %>%
     rename(data_clean = value)
 
-congress_2018 <- bind_cols(congress_df, congress_data_clean_df)  %>%
+congress_2016 <- bind_cols(congress_df, congress_data_clean_df)  %>%
     select(-name)
 
 ### 데이터 정합성 확인
-test_that("국회선거 전국 2018 후보득표검증", {
+test_that("국회선거 2016 후보득표검증", {
 
-    congress_check_df <- congress_2018 %>%
+    congress_check_df <- congress_2016 %>%
         filter(sido == "경기" & precinct == "성남시분당구을") %>%
         pull(data_clean) %>% .[[1]] %>%
         summarise(`더불어민주당 김병욱` = sum(`더불어민주당 김병욱`),
@@ -258,5 +258,5 @@ test_that("국회선거 전국 2018 후보득표검증", {
     expect_that( congress_check_df$`무소속 임태희`,       equals(23921))
 })
 
-usethis::use_data(congress_2018, overwrite = TRUE)
+usethis::use_data(congress_2016, overwrite = TRUE)
 
