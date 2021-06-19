@@ -1,7 +1,10 @@
-#' 지방선거 2018년 - 시군구장
+#' 제7회 2018년 지방선거 - 구시군의 장
 #'
-#' @source http://www.nec.go.kr/portal/bbs/view/B0000338/38843.do?menuNo=200185&searchYear=&searchMonth=&searchWrd=%EC%A7%80%EB%B0%A9%EC%84%A0%EA%B1%B0&searchCnd=1&viewType=&pageIndex=1&section=&searchOption1=
+#'  2018년 6월 13일 대한민국 전역에서 치러진 지방의회 의원 및 지방자치단체의 장을 선출하기 위한 선거
+#'
+#' @name local_2018_sigungu
+#' @source \url{https://www.nec.go.kr/site/nec/ex/bbs/View.do?cbIdx=1129&bcIdx=14979}
 #' @format tibble with columns
 #' @examples
-#'   local_2018
-'local_sigungu_2018'
+#'   local_2018_sigungu
+NULL
