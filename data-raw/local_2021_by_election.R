@@ -59,7 +59,7 @@ get_vote_data <- function(si_code, gu_code) {
         )
     )
 
-    ## 1.2. 개표 결과를 추출합니다.
+    ##### 개표 결과를 추출합니다.
     Sys.setlocale("LC_ALL", "C")
 
     vote_raw <- content(x=resp, as = 'text') %>%
@@ -72,8 +72,8 @@ get_vote_data <- function(si_code, gu_code) {
     return(vote_raw)
 }
 
-# get_vote_data('1100', '1103')
-# get_vote_data('2600', '2603')
+## get_vote_data('1100', '1103')
+## get_vote_data('2600', '2603')
 
 
 # 3. 서울시 보궐선거 데이터 ----------------
@@ -178,13 +178,70 @@ pusan_tbl <- pusan_raw %>%
 
 # 5. 서울/부산시 결합  ----------------
 
+clean_data <- function(data_tbl) {
+
+    by_election_colnames <- data_tbl %>%
+        janitor::clean_names(ascii = FALSE) %>%
+        slice(1) %>%
+        unlist %>%
+        as.character() %>%
+        dput
+
+    clean_tbl <- data_tbl %>%
+        ## 변수명 정상화
+        set_names(by_election_colnames) %>%
+        slice(2:n()) %>%
+        ## 읍면동명 "" 채워넣기
+        mutate(읍면동명 = ifelse(읍면동명 == "", NA, 읍면동명)) %>%
+        mutate(읍면동명 = zoo::na.locf(읍면동명)) %>%
+        mutate(투표구명 = ifelse(투표구명 == "", 읍면동명, 투표구명)) %>%
+        filter(읍면동명 != "합계",
+                   투표구명 != "소계") %>%
+        mutate_at(vars(선거인수:기권수), parse_number)
+
+    return(clean_tbl)
+}
+
+seoul_tbl <- seoul_tbl %>%
+    mutate(clean_data = map(data, clean_data))
+
+pusan_tbl <- pusan_tbl %>%
+    mutate(clean_data = map(data, clean_data))
+
+
 local_2021_by_election <- bind_rows(seoul_tbl, pusan_tbl)
 
 ## 6. 단위테스트 검증 -------------
 
 test_that("지선 2021 보궐 후보득표검증", {
 
+    local_2021_by_election_chk <- local_2021_by_election %>%
+        filter(시도 == "서울시" & 구명 == "종로구") %>%
+        pull(clean_data) %>% .[[1]] %>%
+        mutate_at(vars(contains("당")), funs(as.numeric) ) %>%
+        summarise(`더불어민주당박영선` = sum(`더불어민주당박영선`),
+                  `국민의힘오세훈`     = sum(`국민의힘오세훈`),
+                  `국가혁명당허경영`   = sum(`국가혁명당허경영`))
+
+    expect_that( local_2021_by_election_chk$`더불어민주당박영선`, equals(32309))
+    expect_that( local_2021_by_election_chk$`국민의힘오세훈`,     equals(43255))
+    expect_that( local_2021_by_election_chk$`국가혁명당허경영`,   equals(821	))
+
+    local_2021_by_election_chk <- local_2021_by_election %>%
+        filter(시도 == "부산시" & 구명 == "해운대구") %>%
+        pull(clean_data) %>% .[[1]] %>%
+        mutate_at(vars(contains("당")), funs(as.numeric) ) %>%
+        summarise(`더불어민주당김영춘` = sum(`더불어민주당김영춘`),
+                  `국민의힘박형준`     = sum(`국민의힘박형준`),
+                  `민생당배준현`       = sum(`민생당배준현`))
+
+    expect_that( local_2021_by_election_chk$`더불어민주당김영춘`, equals(58717))
+    expect_that( local_2021_by_election_chk$`국민의힘박형준`,     equals(117478))
+    expect_that( local_2021_by_election_chk$`민생당배준현`,       equals(727	))
+
+
 })
 
 usethis::use_data(local_2021_by_election, overwrite = TRUE)
+
 
