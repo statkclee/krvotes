@@ -1,14 +1,10 @@
-#'  2021년 지방 재보궐선거: 서울특별시/부산광역시
+#'  행정안전부 연령별 인구현황
 #'
-#'  2021년 4월 7일 총 21개 선거구에서 치뤄진 재보궐 선거다.
-#'  - 광역단체장: 2명
-#'  - 기초단체장: 2명
-#'  - 광역의원: 8명
-#'  - 기초의원: 9명
+#'  2020년 12월 31일 기준 (2021년 1월 1일) 시도별, 연령별, 성별 인구수
 #'
-#' @name local_2021_by_election
-#' @source \url{http://info.nec.go.kr/}
+#' @name demographics_tbl
+#' @source \url{https://jumin.mois.go.kr/}
 #' @format 리스트 칼럼을 갖는 티블
 #' @examples
-#'   local_2021_by_election
+#'   demographics_tbl
 NULL
